@@ -79,11 +79,11 @@ $ npm run test:cov
 ## Architecture
 
 ### TypeORM
-Implemented TypeORM Repository pattern: https://docs.nestjs.com/techniques/database#repository-pattern
+Implemented TypeORM with entityManager
 
 ## Links & documentation
 
-https://docs.nestjs.com/techniques/database#repository-pattern
+https://docs.nestjs.com/techniques/database
 https://github.com/typeorm/typeorm/blob/master/docs/relations.md
 https://docs.nestjs.com/microservices/basics
 https://typeorm.io/#/

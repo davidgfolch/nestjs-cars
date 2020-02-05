@@ -10,7 +10,7 @@ export class Car {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @OneToOne(type => Brand, {
+  @OneToOne(type => Brand, brand => brand.id, {
     cascade: true,
   })
   @JoinColumn()
@@ -22,7 +22,10 @@ export class Car {
   @Column()
   firstRegistrationDate: Date;
 
-  @OneToMany(type => Owner, owner => owner.car)
+  @OneToMany(type => Owner, owner => owner.car, {
+    cascade: true
+  })
+  @JoinColumn()
   owners: Owner[];
 
 }

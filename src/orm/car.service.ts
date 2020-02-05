@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectEntityManager } from '@nestjs/typeorm';
 import { Logger } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { EntityManager, Transaction, TransactionManager } from 'typeorm';
 import { Car } from './car.entity';
-// import { Brand } from './brand.entity';
-// import { Owner } from './owner.entity';
+import { Owner } from './owner.entity';
+import { Brand } from './brand.entity';
 
 @Injectable()
 export class CarService {
@@ -12,32 +12,30 @@ export class CarService {
   private readonly log = new Logger(CarService.name);
 
   constructor(
-    @InjectRepository(Car)
-    private readonly repo: Repository<Car>,
-    // @InjectRepository(Brand)
-    // private readonly repoBrand: Repository<Brand>,
-    // @InjectRepository(Owner)
-    // private readonly repoOwner: Repository<Owner>,
+    // @InjectConnection()
+    // private readonly connection: Connection,
+    @InjectEntityManager()
+    private readonly entityManager: EntityManager,
+    @TransactionManager()
+    private readonly  manager: EntityManager,
   ) {}
 
   findAll(): Promise<Car[]> {
     this.log.debug("Search for all cars");
-    this.log.debug("this.repo="+this.repo.constructor.name);
-    this.log.debug("this.repo="+Object.getOwnPropertyNames(this.repo));
-    return this.repo.find();
+    this.log.debug("this.repo="+Object.getOwnPropertyNames(this.entityManager));
+    return this.entityManager.find(Car);
   }
 
+  // @Transaction()
   async create(car: Car): Promise<Car> {
     this.log.debug("Create car "+JSON.stringify(car));
-    let newCar=this.repo.create(car);
-    this.log.debug("Create car "+JSON.stringify(newCar));
-    // let brand=this.repoBrand.create(car.brand);
-    // let owners=this.repoOwner.create(car.owners);
-    // newCar.brand=brand;
-    // newCar.owners=owners;
-    // await this.repoBrand.save(brand);
-    // await this.repoOwner.save(owners);
-    return this.repo.save(newCar);
+    return this.entityManager.transaction(async t => {
+      Promise.all([
+        t.save(Owner,car.owners),
+        t.save(Brand,car.brand)
+      ]);
+      return t.save(Car,car);  
+    }).then((car) => { return car });
   }
 
 }

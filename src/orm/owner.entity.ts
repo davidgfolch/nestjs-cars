@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, ManyToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { Car, CarDTO } from './car.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -13,9 +13,8 @@ export class Owner {
   @Column()
   purchaseDate: Date;
 
-  @ManyToOne(type => Car, car => car.owners, {
-    cascade: true
-  })
+  @ManyToOne(type => Car, car => car.owners)
+  @JoinColumn()
   car: Car;
 
 }
